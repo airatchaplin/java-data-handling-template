@@ -1,6 +1,13 @@
 package com.epam.izh.rd.online.repository;
 
+import java.io.*;
+
 public class SimpleFileRepository implements FileRepository {
+    final String resourcesPath = "src/main/resources/";
+
+    private long countFiles = 0L;
+    private long countDirs = 0L;
+
 
     /**
      * Метод рекурсивно подсчитывает количество файлов в директории
@@ -10,7 +17,21 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public long countFilesInDirectory(String path) {
-        return 0;
+
+        File pathFile = new File(path);
+        if (!pathFile.exists()) {
+            pathFile = new File(resourcesPath + path);
+        }
+        File[] files = pathFile.listFiles();
+
+        assert files != null;
+        for (File file : files) {
+            if (file.isDirectory()) {
+                countFilesInDirectory(file.getPath());
+            } else countFiles++;
+        }
+        return countFiles;
+
     }
 
     /**
@@ -21,7 +42,22 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public long countDirsInDirectory(String path) {
-        return 0;
+
+        File pathFile = new File(path);
+        if (!pathFile.exists()) {
+            pathFile = new File(resourcesPath + path);
+            countDirs++;
+
+        }
+        File[] files = pathFile.listFiles();
+        assert files != null;
+        for (File s : files) {
+            if (s.isDirectory()) {
+                countDirs++;
+                countDirsInDirectory(s.getPath());
+            }
+        }
+        return countDirs;
     }
 
     /**
@@ -32,7 +68,7 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public void copyTXTFiles(String from, String to) {
-        return;
+
     }
 
     /**
@@ -44,6 +80,19 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public boolean createFile(String path, String name) {
+        File filePath = new File(path);
+        if (!filePath.exists()){
+            filePath.mkdir();
+        }
+        File file = new File(path + "/" + name);
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return false;
     }
 
@@ -55,6 +104,16 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public String readFileFromResources(String fileName) {
-        return null;
+
+        String text = null;
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/resources/" + fileName);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+            text = reader.readLine();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return text;
     }
 }

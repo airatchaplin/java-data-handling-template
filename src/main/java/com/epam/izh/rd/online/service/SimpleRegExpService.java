@@ -1,5 +1,7 @@
 package com.epam.izh.rd.online.service;
 
+import java.io.*;
+
 public class SimpleRegExpService implements RegExpService {
 
     /**
@@ -11,7 +13,22 @@ public class SimpleRegExpService implements RegExpService {
      */
     @Override
     public String maskSensitiveData() {
-        return null;
+        String reg1 = "0234 2145";
+        String reg2 = "2012 0532";
+
+        String text = null;
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/resources/sensitive_data.txt");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+            text = reader.readLine();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        text = text.replace(reg1, "**** ****");
+        text = text.replace(reg2, "**** ****");
+
+        return text;
     }
 
     /**
@@ -22,6 +39,22 @@ public class SimpleRegExpService implements RegExpService {
      */
     @Override
     public String replacePlaceholders(double paymentAmount, double balance) {
-        return null;
+        String text = null;
+        String reg1 = "\\$\\{payment_amount\\}";
+        String reg2 = "\\$\\{balance\\}";
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/resources/sensitive_data.txt");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+            text = reader.readLine();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        text = text.replaceAll(reg1, String.valueOf((int) paymentAmount));
+        text = text.replaceAll(reg2, String.valueOf((int) balance));
+
+        return text;
     }
 }
